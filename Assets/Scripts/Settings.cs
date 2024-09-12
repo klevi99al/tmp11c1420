@@ -15,7 +15,6 @@ public class Settings : MonoBehaviour
     {
         new Vector2Int(2, 2),  // 4 cards
         new Vector2Int(2, 3),  // 6 cards
-        new Vector2Int(3, 3),  // 9 cards
         new Vector2Int(2, 4),  // 8 cards
         new Vector2Int(3, 4),  // 12 cards
         new Vector2Int(4, 4),  // 16 cards

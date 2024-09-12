@@ -73,5 +73,9 @@ public class Card : MonoBehaviour
         cardFront = null;
         comparingCard = null;
         cardImage.sprite = cardBack;
+
+        Color newColor = cardImage.color;
+        newColor.a = 0;
+        cardImage.color = newColor;
     }
 }

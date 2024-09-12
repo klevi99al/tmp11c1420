@@ -1,10 +1,28 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro;
 
 public class Settings : MonoBehaviour
 {
+    [Header("References")]
+    public TMP_Text layoutText;
+
     public static Settings Instance { get; private set; }
     private int gameDifficluty;
+
+    private List<Vector2Int> gridSizes = new()
+    {
+        new Vector2Int(2, 2),  // 4 cards
+        new Vector2Int(2, 3),  // 6 cards
+        new Vector2Int(3, 3),  // 9 cards
+        new Vector2Int(2, 4),  // 8 cards
+        new Vector2Int(3, 4),  // 12 cards
+        new Vector2Int(4, 4),  // 16 cards
+        new Vector2Int(4, 5),  // 20 cards
+    };
+
+    private int selectedLayoutIndex = 0;
 
     private void Awake()
     {
@@ -17,6 +35,29 @@ public class Settings : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void ChangeLayout(bool isNextButton)
+    {
+        if (isNextButton)
+        {
+            selectedLayoutIndex++;
+            if (selectedLayoutIndex >= gridSizes.Count)
+            {
+                selectedLayoutIndex = 0;
+            }
+        }
+        else
+        {
+            selectedLayoutIndex--;
+            if (selectedLayoutIndex < 0)
+            {
+                selectedLayoutIndex = gridSizes.Count - 1;
+            }
+        }
+
+        Vector2Int selectedLayout = gridSizes[selectedLayoutIndex];
+        layoutText.text = $"{selectedLayout.x} x {selectedLayout.y}";
     }
 
     public void SetGameDifficulty(int difficulty)

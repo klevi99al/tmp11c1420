@@ -11,7 +11,7 @@ public class Settings : MonoBehaviour
     public static Settings Instance { get; private set; }
     private int gameDifficluty;
 
-    private List<Vector2Int> gridSizes = new()
+    public List<Vector2Int> gridSizes = new()
     {
         new Vector2Int(2, 2),  // 4 cards
         new Vector2Int(2, 3),  // 6 cards
@@ -22,7 +22,7 @@ public class Settings : MonoBehaviour
         new Vector2Int(4, 5),  // 20 cards
     };
 
-    private int selectedLayoutIndex = 0;
+    [SerializeField] private int selectedLayoutIndex = 0;
 
     private void Awake()
     {
@@ -69,5 +69,10 @@ public class Settings : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public Vector2Int GetCurrentLayout()
+    {
+        return gridSizes[selectedLayoutIndex];
     }
 }

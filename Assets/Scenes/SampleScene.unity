@@ -3015,9 +3015,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c90f4fa780d0a804fae473b8f3a9adf9, type: 3}
   - {fileID: 21300000, guid: 0e10aa9e0621c0f4abcbc8608db48a31, type: 3}
   - {fileID: 21300000, guid: ec7512fb47ab1b6479113716d99e500d, type: 3}
-  cardSpacing: 2
+  cardBackImage: {fileID: 21300000, guid: 3f2e724552b009e40843b27364f7ba90, type: 3}
   cardsSpawned: 0
   allCards: []
+  firstRevealedCard: {fileID: 0}
+  secondRevealedCard: {fileID: 0}
+  matchesText: {fileID: 179527766}
 --- !u!1 &1366599834
 GameObject:
   m_ObjectHideFlags: 0
@@ -4114,17 +4117,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 495
     m_Right: 0
-    m_Top: 30
+    m_Top: 37
     m_Bottom: 0
-  m_ChildAlignment: 4
+  m_ChildAlignment: 0
   m_StartCorner: 0
-  m_StartAxis: 1
-  m_CellSize: {x: 150, y: 200}
-  m_Spacing: {x: 60, y: 20}
-  m_Constraint: 0
-  m_ConstraintCount: 5
+  m_StartAxis: 0
+  m_CellSize: {x: 170, y: 230}
+  m_Spacing: {x: 38.85, y: 19.86}
+  m_Constraint: 2
+  m_ConstraintCount: 4
 --- !u!1 &1905206372
 GameObject:
   m_ObjectHideFlags: 0

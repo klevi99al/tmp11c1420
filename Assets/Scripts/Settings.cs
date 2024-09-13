@@ -34,6 +34,16 @@ public class Settings : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
+
+        // Load the saved layout index
+        if (PlayerPrefs.HasKey("SelectedLayoutIndex"))
+        {
+            selectedLayoutIndex = PlayerPrefs.GetInt("SelectedLayoutIndex");
+        }
+
+        // Update the layout text
+        Vector2Int selectedLayout = gridSizes[selectedLayoutIndex];
+        layoutText.text = $"{selectedLayout.x} x {selectedLayout.y}";
     }
 
     public void ChangeLayout(bool isNextButton)
@@ -57,6 +67,9 @@ public class Settings : MonoBehaviour
 
         Vector2Int selectedLayout = gridSizes[selectedLayoutIndex];
         layoutText.text = $"{selectedLayout.x} x {selectedLayout.y}";
+
+        PlayerPrefs.SetInt("SelectedLayoutIndex", selectedLayoutIndex);
+        PlayerPrefs.Save();
     }
 
     public void SetGameDifficulty(int difficulty)

@@ -30,9 +30,21 @@ public class GameManager : MonoBehaviour
 
     private readonly string matchesStr = "Matches: ";
     private readonly string turnsStr = "Turns: ";
+    private bool gameLoaded = false;
 
     public void StartTheGame()
     {
+        LoadGame();
+        if (gameLoaded)
+        {
+            gameLoaded = false;
+            return;
+        }
+    }
+
+    public void NewGame()
+    {
+        ClearData();
         ResetCards();
 
         Vector2Int layout = Settings.Instance.GetCurrentLayout();
@@ -164,6 +176,7 @@ public class GameManager : MonoBehaviour
 
     private void GameResetScreen()
     {
+        ClearData();
         newGame.SetActive(true);
     }
 
@@ -181,5 +194,126 @@ public class GameManager : MonoBehaviour
         firstRevealedCard = null;
         secondRevealedCard = null;
         matches = 0;
+    }
+
+
+    public void SaveGame()
+    {
+        PlayerPrefs.SetInt("Matches", matches);
+        PlayerPrefs.SetInt("Turns", turns);
+
+        // Save the current grid layout (rows and columns)
+        Vector2Int currentLayout = Settings.Instance.GetCurrentLayout();
+        PlayerPrefs.SetInt("GridRows", currentLayout.x);
+        PlayerPrefs.SetInt("GridColumns", currentLayout.y);
+
+        // Save card states
+        for (int i = 0; i < allCards.Count; i++)
+        {
+            Card card = allCards[i];
+            PlayerPrefs.SetInt($"Card_{i}_ID", card.id);
+            PlayerPrefs.SetInt($"Card_{i}_IsActive", card.isActive ? 1 : 0);
+
+            // Save the index of the card front sprite
+            int spriteIndex = Array.IndexOf(spriteRenderers, card.cardFront);
+            PlayerPrefs.SetInt($"Card_{i}_FrontSpriteIndex", spriteIndex);
+
+            // Save the position of found (deactivated) cards
+            if (!card.isActive) // Only store the index for matched cards
+            {
+                PlayerPrefs.SetInt($"Card_{i}_FoundIndex", i); // Save the card's index
+            }
+        }
+
+        PlayerPrefs.SetInt("CardCount", allCards.Count);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadGame()
+    {
+        if (PlayerPrefs.HasKey("Matches"))
+        {
+            gameLoaded = true;
+            matches = PlayerPrefs.GetInt("Matches");
+            turns = PlayerPrefs.GetInt("Turns");
+
+            matchesText.text = matchesStr + matches.ToString();
+            turnsText.text = turnsStr + turns.ToString();
+
+            int cardCount = PlayerPrefs.GetInt("CardCount");
+
+            // Load the saved grid layout dimensions
+            int rows = PlayerPrefs.GetInt("GridRows", 4);  // Default to 4 rows if not found
+            int columns = PlayerPrefs.GetInt("GridColumns", 3);  // Default to 3 columns if not found
+
+            // Set the grid layout to match the saved game
+            GridLayoutGroup gridLayout = cardParent.GetComponent<GridLayoutGroup>();
+            if (gridLayout != null)
+            {
+                gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                gridLayout.constraintCount = columns;  // Set the column count from saved data
+            }
+
+            allCards.Clear();
+
+            for (int i = 0; i < cardCount; i++)
+            {
+                int id = PlayerPrefs.GetInt($"Card_{i}_ID");
+                bool isActive = PlayerPrefs.GetInt($"Card_{i}_IsActive") == 1;
+
+                // Load the index of the front sprite and retrieve the corresponding sprite
+                int spriteIndex = PlayerPrefs.GetInt($"Card_{i}_FrontSpriteIndex");
+                Sprite frontSprite = spriteRenderers[spriteIndex];
+
+                // Create a new card for each saved state
+                GameObject card = Instantiate(cardPrefab, cardParent);
+                Card cardComponent = card.GetComponent<Card>();
+                cardComponent.InitializeCard(frontSprite, cardBackImage, id, this);
+
+                Image cardImage = cardComponent.gameObject.GetComponent<Image>();
+                if (!isActive) // If the card was matched, make it invisible
+                {
+                    cardComponent.ShowBack();
+                    Color newColor = cardImage.color;
+                    newColor.a = 255;  // Make the matched card invisible (alpha = 0)
+                    cardImage.color = newColor;
+                }
+                else
+                {
+                    cardComponent.ShowFront(); // Unmatched card should show its back
+                    Color newColor = cardImage.color;
+                    newColor.a = 0;  // Ensure unmatched cards are fully visible (alpha = 1)
+                    cardImage.color = newColor;
+                }
+
+                allCards.Add(cardComponent);
+            }
+        }
+    }
+
+
+
+    public void ClearData()
+    {
+        // Remove all saved data related to the game
+        PlayerPrefs.DeleteKey("Matches");
+        PlayerPrefs.DeleteKey("Turns");
+
+        int cardCount = PlayerPrefs.GetInt("CardCount", 0);
+        for (int i = 0; i < cardCount; i++)
+        {
+            PlayerPrefs.DeleteKey($"Card_{i}_ID");
+            PlayerPrefs.DeleteKey($"Card_{i}_IsActive");
+        }
+
+        PlayerPrefs.DeleteKey("CardCount");
+
+        // Ensure that changes are saved
+        PlayerPrefs.Save();
+
+        Debug.Log("Game data cleared.");
+
+        // Optionally reset the game state after clearing data
+        ResetCards();  // Reset the cards in the scene
     }
 }
